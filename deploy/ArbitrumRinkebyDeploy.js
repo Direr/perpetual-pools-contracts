@@ -117,7 +117,7 @@ module.exports = async (hre) => {
     const keeperRewards = await deploy("KeeperRewards", {
         from: deployer,
         log: true,
-        libraries: { CalldataLogic: calldataLogic.address },
+        libraries: { PoolSwapLibrary: library.address },
         args: [poolKeeper.address],
     })
 
@@ -186,6 +186,8 @@ module.exports = async (hre) => {
             SMA_DEFAULT_PERIODS, // number of periods
             SMA_DEFAULT_UPDATE_INTERVAL, // Update interval
             deployer, // deployer address
+            deployer,
+            deployer,
         ],
     })
 
@@ -199,6 +201,16 @@ module.exports = async (hre) => {
         "poll"
     )
 
+    await execute(
+        "EthUsdSMAOracle",
+        {
+            from: deployer,
+            log: true,
+        },
+        "setPoolKeeper",
+        poolKeeper.address
+    )
+
     const btcSmaOracleWrapper = await deploy("BtcUsdSMAOracle", {
         from: deployer,
         log: true,
@@ -208,6 +220,8 @@ module.exports = async (hre) => {
             SMA_DEFAULT_PERIODS, // number of periods
             SMA_DEFAULT_UPDATE_INTERVAL, // Update interval
             deployer, // deployer address
+            deployer,
+            deployer,
         ],
     })
 
@@ -219,6 +233,16 @@ module.exports = async (hre) => {
             log: true,
         },
         "poll"
+    )
+
+    await execute(
+        "BtcUsdSMAOracle",
+        {
+            from: deployer,
+            log: true,
+        },
+        "setPoolKeeper",
+        poolKeeper.address
     )
 
     // deploy pools
