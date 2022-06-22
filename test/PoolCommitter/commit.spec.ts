@@ -1236,8 +1236,8 @@ describe("PoolCommitter - commit", () => {
                                 await timeout(updateInterval * 1000)
                                 await pool.poolUpkeep(2000, 2000)
 
-                                // 2000 Long tokens burnt at $1.462117157  == $2924.234314
-                                // $2924.234314 then minted to be Short tokens at $0.537882843 ~= 5436563656918090470721 pool tokens
+                                // 2000 Long tokens burnt at $1.5 == $3000
+                                // $3000 then minted to be Short tokens at $0.5 == 6000 pool tokens
 
                                 const balance =
                                     await poolCommitter.getAggregateBalance(
@@ -1250,7 +1250,7 @@ describe("PoolCommitter - commit", () => {
                                     )
                                 ).to.equal(
                                     ethers.utils.parseEther(
-                                        "5436.563656918090470721"
+                                        "6000"
                                     )
                                 )
                             })
@@ -1560,8 +1560,8 @@ describe("PoolCommitter - commit", () => {
                             await timeout(updateInterval * 1000)
                             await pool.poolUpkeep(2000, 2000)
 
-                            // 2000 Long tokens burnt at $1.462117157  == $2924.234314
-                            // $2924.234314 then minted to be Short tokens at $0.537882843 ~= 5436563656918090470721 pool tokens
+                            // 2000 Long tokens burnt at $1.5 == $3000
+                            // $3000 then minted to be Short tokens at $0.5 == 6000 pool tokens
 
                             const balance =
                                 await poolCommitter.getAggregateBalance(
@@ -1574,7 +1574,7 @@ describe("PoolCommitter - commit", () => {
                                 )
                             ).to.equal(
                                 ethers.utils.parseEther(
-                                    "5436.563656918090470721"
+                                    "6000"
                                 )
                             )
                         })
@@ -1847,8 +1847,8 @@ describe("PoolCommitter - commit", () => {
                             await timeout(updateInterval * 1000)
                             await pool.poolUpkeep(2000, 2000)
 
-                            // 2000 Short tokens burnt at $0.537882843 == $1075.76568548 (sigmoid value transfer)
-                            // $1075.76568548 then minted to be Long tokens at $1.462117157 == 735.758882342884643190 pool tokens
+                            // 2000 Short tokens burnt at $0.5 == $1000
+                            // $1000 then minted to be Long tokens at $1.5 == 666.6 pool tokens
                             const balance =
                                 await poolCommitter.getAggregateBalance(
                                     signers[0].address
@@ -1857,7 +1857,7 @@ describe("PoolCommitter - commit", () => {
                                 balance.longTokens.sub(balanceBefore.longTokens)
                             ).to.equal(
                                 ethers.utils.parseEther(
-                                    "735.758882342884643190"
+                                    "666.666666666666666666"
                                 )
                             )
                             expect(balance.shortTokens).to.equal(0)

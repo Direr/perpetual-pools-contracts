@@ -118,10 +118,10 @@ describe("LeveragedPool - executeAllCommitments", async () => {
             const longTokenTotalSupplyAfter = await longToken.totalSupply()
 
             // tokensMinted = 1 / ((settlement/poolToken) / settlementCommitted)
-            //              = 1 / ((3462.117157260 / 2367.879441171) / amountCommitted)
-            //              = 1367.8794411...
+            //              = 1 / ((3000 / 2000) / amountCommitted)
+            //              = 1333.3333333...
             const expectedLongTokenDifference = ethers.utils.parseEther(
-                "1367.879441171442321595"
+                "1333.333333333333333333"
             )
 
             // Should be equal since the commits are long commits
@@ -139,11 +139,11 @@ describe("LeveragedPool - executeAllCommitments", async () => {
                 .sub(shortBalanceAfter)
                 .toString()
 
-            // Based on token price, (3462.117157260 / 2367.879441171)
+            // Based on token price, (3000 / 2000)
             // price * poolTokensBurnt
-            // = (3462.117157260 / 2367.879441171) * 1000 = 1462.11715726
+            // = (3000 / 2000) * 1000 = 1500
             const longBalanceDecreaseOnBurn = ethers.utils.parseEther(
-                "1462.117157260009758502"
+                "1500"
             )
             expect(longBalanceDecreaseOnBurn).to.equal(
                 longBalanceBefore

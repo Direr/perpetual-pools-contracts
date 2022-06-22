@@ -241,9 +241,9 @@ library PoolSwapLibrary {
      * @dev The value transfer is calculated using a sigmoid function
      * @dev The sigmoid function used is defined as follows:
      *          when newPrice >= oldPrice
-     *              losing_pool_multiplier = 2 / (1 + e^(-2 * L * (1 - (newPrice / oldPrice)))) - 1
+     *              losing_pool_multiplier = - e^(-1 * L * log(newPrice / oldPrice)) + 1
      *          when newPrice < oldPrice
-     *              losing_pool_multiplier = 2 / (1 + e^(-2 * L * (1 - (oldPrice / newPrice)))) - 1
+     *              losing_pool_multiplier = - e^(-1 * L * log(oldPrice / newPrice)) + 1
      *          where
      *              e = euler's number
      *              L = leverage
@@ -355,13 +355,11 @@ library PoolSwapLibrary {
      */
     function sigmoid(bytes16 leverage, bytes16 ratio) private pure returns (bytes16) {
         /**
-         * denominator = 1 + e ^ (-2 * leverage * (1 - ratio))
+         *
          */
-        bytes16 denominator = ABDKMathQuad.mul(ABDKMathQuad.fromInt(-2), leverage);
-        denominator = ABDKMathQuad.mul(denominator, ABDKMathQuad.sub(ONE, ratio));
-        denominator = ABDKMathQuad.add(ONE, ABDKMathQuad.exp(denominator));
-        bytes16 numerator = ABDKMathQuad.add(ONE, ONE); // 2
-        return ABDKMathQuad.sub((ABDKMathQuad.div(numerator, denominator)), ONE);
+        return ABDKMathQuad.sub(ONE, ABDKMathQuad.pow_2(
+            ABDKMathQuad.mul(leverage, ABDKMathQuad.log_2(ratio))
+        ));
     }
 
     /**
