@@ -49,7 +49,7 @@ module.exports = async (hre) => {
         from: deployer,
         log: true,
         contract: "ChainlinkOracleWrapper",
-        args: [MainnetBtcUsdOracle.address],
+        args: [RinkebyBtcUsdOracle.address],
     })
 
     // const oracleWrapper = { address: "0x57A81f7B72D2703ae7c533F3FB1CdEFa6B8f25F7" }
@@ -60,7 +60,7 @@ module.exports = async (hre) => {
         from: deployer,
         log: true,
         contract: "ChainlinkOracleWrapper",
-        args: [MainnetEthUsdOracle.address],
+        args: [RinkebyEthUsdOracle.address],
     })
 
     /* Commented out, because we want to wait till multisig governs pools before doing it for the rest of them
@@ -274,11 +274,11 @@ module.exports = async (hre) => {
     /*
     await hre.run("verify:verify", {
         address: oracleWrapper.address,
-        constructorArguments: [MainnetBtcUsdOracle.address],
+        constructorArguments: [RinkebyBtcUsdOracle.address],
     })
     await hre.run("verify:verify", {
         address: keeperOracle.address,
-        constructorArguments: [MainnetEthUsdOracle.address],
+        constructorArguments: [RinkebyEthUsdOracle.address],
     })
     await hre.run("verify:verify", {
         address: poolCommitterDeployer.address,
