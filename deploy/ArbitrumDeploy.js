@@ -168,8 +168,8 @@ module.exports = async (hre) => {
     const BTC_POOL_CODE = "BTC/USD"
     const ETH_POOL_CODE = "ETH/USD"
 
-    const updateInterval = 3600 // 60 mins
-    const frontRunningInterval = 300 // 5 mins
+    const updateInterval = 300 // 5 mins
+    const frontRunningInterval = 30 // 30 secs
     const oneLeverage = 1
     const threeLeverage = 3
     // USDC precision is 6 decimals
