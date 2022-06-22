@@ -235,7 +235,13 @@ module.exports = async (hre) => {
         deploymentData4,
     ]
 
-    // console.log(`Deploy PoolKeeper: ${poolKeeper.address}`)
+    console.log(``)
+    console.log(`Deployed PoolFactory: ${factory.address}`)
+    console.log(`Deployed PoolKeeper: ${poolKeeper.address}`)
+    console.log(`Deployed TestToken: ${token.address}`)
+    console.log(`Deployed OracleWrapper: ${oracleWrapper.address}`)
+    console.log(``)
+    
     for (var i = 0; i < deploymentData.length; i++) {
         let receipt = await execute(
             "PoolFactory",
@@ -249,11 +255,17 @@ module.exports = async (hre) => {
 
         const event = receipt.events.find((el) => el.event === "DeployPool")
 
-        console.log(`Deployed PoolFactory: ${factory.address}`)
+        let leveragedPool = await ethers.getContractAt("LeveragedPool", event.args.pool)
+        let committer = await leveragedPool.poolCommitter()
+        let longTokenAddr = await leveragedPool.tokens(0)
+        let shortTokenAddr = await leveragedPool.tokens(1)
+        
+        console.log(``)
         console.log(`Deployed LeveragedPool: ${event.args.pool}`)
-        console.log(`Deploy PoolKeeper: ${poolKeeper.address}`)
-        console.log(`Deployed TestToken: ${token.address}`)
-        console.log(`Deployed OracleWrapper: ${oracleWrapper.address}`)
+        console.log(`Deployed PoolCommitter: ${committer}`)
+        console.log(`Deployed longToken: ${longTokenAddr}`)
+        console.log(`Deployed shortToken: ${shortTokenAddr}`)
+        console.log(``)
     }
 
     /* Commented out, because we want to wait till multisig governs pools before doing it for the rest of them
