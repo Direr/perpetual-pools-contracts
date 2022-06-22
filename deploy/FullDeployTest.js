@@ -134,6 +134,8 @@ module.exports = async (hre) => {
     const frontRunningInterval = 60 // seconds
     const leverage = 1
 
+    const minimumCommitSize = 1000 * 10 ** 6
+    const maximumCommitQueueLength = 100
     /* deploy LeveragePool */
     const deploymentData = {
         poolName: POOL_CODE,
@@ -143,6 +145,8 @@ module.exports = async (hre) => {
         quoteToken: token.address,
         oracleWrapper: oracleWrapper.address,
         settlementEthOracle: keeperOracle.address,
+        minimumCommitSize: minimumCommitSize,
+        maximumCommitQueueLength: maximumCommitQueueLength,
     }
 
     const receipt = await execute(
