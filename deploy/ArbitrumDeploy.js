@@ -271,6 +271,7 @@ module.exports = async (hre) => {
     )
     */
 
+    /*
     await hre.run("verify:verify", {
         address: oracleWrapper.address,
         constructorArguments: [MainnetBtcUsdOracle.address],
@@ -287,6 +288,7 @@ module.exports = async (hre) => {
         address: poolKeeper.address,
         constructorArguments: [factory.address],
     })
+    */
 }
 
 module.exports.tags = ["ArbDeploy"]
