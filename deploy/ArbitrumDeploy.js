@@ -23,7 +23,7 @@ module.exports = async (hre) => {
 
     /* deploy testToken */
     const token = await deploy("TestToken", {
-        args: ["Test Tracer USDC", "TUSDC"],
+        args: ["Yet Another Test Tracer USDC", "YATUSDC"],
         from: deployer,
         log: true,
         contract: "TestToken",
@@ -235,13 +235,13 @@ module.exports = async (hre) => {
         deploymentData4,
     ]
 
-    console.log(``)
     console.log(`Deployed PoolFactory: ${factory.address}`)
     console.log(`Deployed PoolKeeper: ${poolKeeper.address}`)
     console.log(`Deployed TestToken: ${token.address}`)
     console.log(`Deployed OracleWrapper: ${oracleWrapper.address}`)
-    console.log(``)
-    
+
+    let configs = []
+
     for (var i = 0; i < deploymentData.length; i++) {
         let receipt = await execute(
             "PoolFactory",
@@ -255,18 +255,45 @@ module.exports = async (hre) => {
 
         const event = receipt.events.find((el) => el.event === "DeployPool")
 
-        let leveragedPool = await ethers.getContractAt("LeveragedPool", event.args.pool)
-        let committer = await leveragedPool.poolCommitter()
-        let longTokenAddr = await leveragedPool.tokens(0)
-        let shortTokenAddr = await leveragedPool.tokens(1)
-        
-        console.log(``)
-        console.log(`Deployed LeveragedPool: ${event.args.pool}`)
-        console.log(`Deployed PoolCommitter: ${committer}`)
-        console.log(`Deployed longToken: ${longTokenAddr}`)
-        console.log(`Deployed shortToken: ${shortTokenAddr}`)
-        console.log(``)
+        let pool = await ethers.getContractAt("LeveragedPool", event.args.pool)
+
+        let config = {
+            name: '' + deploymentData[i].leverageAmount + '-' + deploymentData[i].poolName,
+            address: pool.address,
+            leverage: deploymentData[i].leverageAmount,
+            updateInterval: 'updateInterval',
+            frontRunningInterval: 'frontRunningInterval',
+            keeper: poolKeeper.address,
+            committer: {
+                address: await pool.poolCommitter(),
+            },
+            longToken: {
+                name: '' + deploymentData[i].leverageAmount + 'L-' + deploymentData[i].poolName,
+                address: await pool.tokens(0),
+                symbol: '' + deploymentData[i].leverageAmount + 'L-' + deploymentData[i].poolName,
+                decimals: 18,
+            },
+            shortToken: {
+                name: '' + deploymentData[i].leverageAmount + 'S-' + deploymentData[i].poolName,
+                address: await pool.tokens(1),
+                symbol: '' + deploymentData[i].leverageAmount + 'S-' + deploymentData[i].poolName,
+                decimals: 18,
+            },
+            quoteToken: {
+                name: 'Yet Another Test Trader USDC',
+                symbol: 'YATUSDC',
+                address: token.address,
+                decimals: 18,
+            },
+        }
+
+        configs.push(config)
     }
+
+    console.log(JSON.stringify(configs, null, 4)
+        .replace(/"([^"]+)":/g, '$1:')
+        .replaceAll('\"updateInterval\"', 'FIVE_MINUTES')
+        .replaceAll('\"frontRunningInterval\"', 'THIRTY_SECONDS'))
 
     /* Commented out, because we want to wait till multisig governs pools before doing it for the rest of them
     await execute(
