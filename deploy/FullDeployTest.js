@@ -73,6 +73,7 @@ module.exports = async (hre) => {
         libraries: { PoolSwapLibrary: library.address },
         // (fee receiver)
         args: [accounts[0].address],
+        gasLimit: 3e8,
     })
 
     /* deploy PoolFactory */

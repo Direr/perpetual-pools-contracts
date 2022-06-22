@@ -97,6 +97,7 @@ module.exports = async (hre) => {
         libraries: { PoolSwapLibrary: library.address },
         // (fee receiver)
         args: [multisigAddress],
+        gasLimit: 3e8,
     })
 
     // deploy PoolCommitterDeployer
