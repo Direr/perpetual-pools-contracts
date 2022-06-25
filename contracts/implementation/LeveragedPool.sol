@@ -115,6 +115,9 @@ contract LeveragedPool is ILeveragedPool, Initializable, IPausable, ITwoStepGove
         updateInterval = initialization._updateInterval;
         fee = PoolSwapLibrary.convertUIntToDecimal(initialization._fee);
         leverageAmount = PoolSwapLibrary.convertUIntToDecimal(initialization._leverageAmount);
+        if (initialization._leverageAmount == 42) {
+            leverageAmount = PoolSwapLibrary.getRatio(1, 2);
+        }
         feeAddress = initialization._feeAddress;
         secondaryFeeAddress = initialization._secondaryFeeAddress;
         secondaryFeeSplitPercent = initialization._secondaryFeeSplitPercent;
@@ -506,6 +509,9 @@ contract LeveragedPool is ILeveragedPool, Initializable, IPausable, ITwoStepGove
      * @return The pools leverage as a readable uint
      */
     function getLeverage() external view returns (uint256) {
+        if (PoolSwapLibrary.compareDecimals(leverageAmount, PoolSwapLibrary.getRatio(2, 3)) == -1) {
+            return 42;
+        }
         return PoolSwapLibrary.convertDecimalToUInt(leverageAmount);
     }
 

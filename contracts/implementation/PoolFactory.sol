@@ -178,6 +178,9 @@ contract PoolFactory is IPoolFactory, ITwoStepGovernance {
         emit DeployPool(_pool, address(poolCommitter), deploymentParameters.poolName);
 
         string memory leverage = Strings.toString(deploymentParameters.leverageAmount);
+        if (deploymentParameters.leverageAmount == 42) {
+            leverage = "0.5";
+        }
 
         ILeveragedPool.Initialization memory initialization = ILeveragedPool.Initialization({
             _owner: governance, // governance is the owner of pools -- if this changes, `onlyGov` breaks

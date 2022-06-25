@@ -15,6 +15,7 @@ module.exports = async (hre) => {
     const POOL_DEFAULT_UPDATE_INTERVAL = 300
     const POOL_DEFAULT_CHANGE_INTERVAL = "0"
 
+    const HALF_LEVERAGE = 42
     const ONE_LEVERAGE = 1
     const THREE_LEVERAGE = 3
 
@@ -247,12 +248,12 @@ module.exports = async (hre) => {
 
     // deploy pools
 
-    // ETH-USD 1x
+    // ETH-USD 0.5x
     const deploymentData1 = {
         poolName: ETH_POOL_CODE,
         frontRunningInterval: POOL_DEFAULT_FRONT_RUNNING_INTERVAL,
         updateInterval: POOL_DEFAULT_UPDATE_INTERVAL,
-        leverageAmount: ONE_LEVERAGE,
+        leverageAmount: HALF_LEVERAGE,
         settlementToken: token.address,
         oracleWrapper: ethSmaOracleWrapper.address,
         settlementEthOracle: ethOracleWrapper.address,
@@ -262,42 +263,12 @@ module.exports = async (hre) => {
         changeInterval: POOL_DEFAULT_CHANGE_INTERVAL,
     }
 
-    // ETH-USD 3x
+    // BTC-USD 0.5x
     const deploymentData2 = {
-        poolName: ETH_POOL_CODE,
-        frontRunningInterval: POOL_DEFAULT_FRONT_RUNNING_INTERVAL,
-        updateInterval: POOL_DEFAULT_UPDATE_INTERVAL,
-        leverageAmount: THREE_LEVERAGE,
-        settlementToken: token.address,
-        oracleWrapper: ethSmaOracleWrapper.address,
-        settlementEthOracle: ethOracleWrapper.address,
-        feeController: deployer,
-        mintingFee: POOL_DEFAULT_MINTING_FEE,
-        burningFee: POOL_DEFAULT_BURNING_FEE,
-        changeInterval: POOL_DEFAULT_CHANGE_INTERVAL,
-    }
-
-    // BTC-USD 1x
-    const deploymentData3 = {
         poolName: BTC_POOL_CODE,
         frontRunningInterval: POOL_DEFAULT_FRONT_RUNNING_INTERVAL,
         updateInterval: POOL_DEFAULT_UPDATE_INTERVAL,
-        leverageAmount: ONE_LEVERAGE,
-        settlementToken: token.address,
-        oracleWrapper: btcSmaOracleWrapper.address,
-        settlementEthOracle: ethOracleWrapper.address,
-        feeController: deployer,
-        mintingFee: POOL_DEFAULT_MINTING_FEE,
-        burningFee: POOL_DEFAULT_BURNING_FEE,
-        changeInterval: POOL_DEFAULT_CHANGE_INTERVAL,
-    }
-
-    // BTC-USD 3x
-    const deploymentData4 = {
-        poolName: BTC_POOL_CODE,
-        frontRunningInterval: POOL_DEFAULT_FRONT_RUNNING_INTERVAL,
-        updateInterval: POOL_DEFAULT_UPDATE_INTERVAL,
-        leverageAmount: THREE_LEVERAGE,
+        leverageAmount: HALF_LEVERAGE,
         settlementToken: token.address,
         oracleWrapper: btcSmaOracleWrapper.address,
         settlementEthOracle: ethOracleWrapper.address,
@@ -310,8 +281,6 @@ module.exports = async (hre) => {
     const deploymentData = [
         deploymentData1,
         deploymentData2,
-        deploymentData3,
-        deploymentData4,
     ]
 
     console.log(`Deployed TestToken: ${token.address}`)
