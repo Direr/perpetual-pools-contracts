@@ -87,6 +87,19 @@ const config: HardhatUserConfig = {
             default: 0,
         },
     },
+    external: {
+        contracts: [
+            {
+                artifacts: "node_modules/@uniswap/v2-core/build",
+            },
+            {
+                artifacts: "node_modules/@uniswap/v2-periphery/build",
+            },
+            {
+                artifacts: "node_modules/canonical-weth/build/contracts",
+            },
+        ]
+    },
 }
 
 export default config

@@ -4,6 +4,7 @@ module.exports = async (hre) => {
     const { deployer } = await getNamedAccounts()
     const accounts = await ethers.getSigners()
 
+    const DEPLOY_ROUTER_GAS_LIMIT = 100000000
     const DEPLOY_POOL_GAS_LIMIT = 10000000
 
     const POOL_DEFAULT_MINTING_FEE = ethers.utils.parseEther("0.015")
@@ -51,17 +52,46 @@ module.exports = async (hre) => {
         btcEth8hPool,
     ]
 
-    /* deploy testToken */
-    const token = await deploy("TestToken", {
+    // deploy Uniswap V2
+    const uniswapV2Factory = await deploy("UniswapV2Factory", {
+        args: [deployer],
+        from: deployer,
+        log: true,
+        contract: "UniswapV2Factory",
+    })
+
+    const weth9 = await deploy("WETH9", {
+        from: deployer,
+        log: true,
+        contract: "WETH9",
+    })
+
+    const uniswapV2Router02 = await deploy("UniswapV2Router02", {
+        args: [uniswapV2Factory.address, weth9.address],
+        from: deployer,
+        log: true,
+        contract: "UniswapV2Router02",
+        gasLimit: DEPLOY_ROUTER_GAS_LIMIT,
+    })
+
+    // deploy test tokens
+    const token1 = await deploy("TestTokenUSD", {
         args: ["Perpetual USD", "PPUSD"],
         from: deployer,
         log: true,
         contract: "TestToken",
     })
 
-    // mint some dollar bills
+    const token2 = await deploy("TestTokenEUR", {
+        args: ["Perpetual EUR", "PPEUR"],
+        from: deployer,
+        log: true,
+        contract: "TestToken",
+    })
+
+    // mint some bills
     await execute(
-        "TestToken",
+        "TestTokenUSD",
         {
             from: deployer,
             log: true,
@@ -70,6 +100,32 @@ module.exports = async (hre) => {
         accounts[0].address,
         ethers.utils.parseEther("100000000") // 100 mil supply
     )
+
+    await execute(
+        "TestTokenEUR",
+        {
+            from: deployer,
+            log: true,
+        },
+        "mint",
+        accounts[0].address,
+        ethers.utils.parseEther("100000000") // 100 mil supply
+    )
+
+    // deploy LP token
+    let receipt = await execute(
+        "UniswapV2Factory",
+        {
+            from: deployer,
+            log: true,
+        },
+        "createPair",
+        token1.address,
+        token2.address
+    )
+    const token = {
+        address: receipt.events.find(e => e.event == "PairCreated").args[2]
+    }
 
     // deploy PoolSwapLibrary
     const library = await deploy("PoolSwapLibrary", {
