@@ -4,8 +4,7 @@ module.exports = async (hre) => {
     const { deployer } = await getNamedAccounts()
     const accounts = await ethers.getSigners()
 
-    const DEPLOY_ROUTER_GAS_LIMIT = 100000000
-    const DEPLOY_POOL_GAS_LIMIT = 10000000
+    const DEPLOY_POOL_GAS_LIMIT = 100000000
 
     const POOL_DEFAULT_MINTING_FEE = ethers.utils.parseEther("0.015")
     const POOL_DEFAULT_BURNING_FEE = ethers.utils.parseEther("0.015")
@@ -19,37 +18,36 @@ module.exports = async (hre) => {
     const ethUsdSpotPricePool = {
         code: "ETH/USD+USDC-12h",
         stylizedCode: "EthUsdSpotPrice",
-        oracleAddress: "0x5f0423B1a6935dc5596e7A24d98532b67A0AeFd8",
         frontRunningInterval: 300,
         updateInterval: 43200,
     }
     const ethUsd8hPool = {
         code: "ETH/USD+USDC",
         stylizedCode: "EthUsd8h",
-        oracleAddress: "0x5f0423B1a6935dc5596e7A24d98532b67A0AeFd8",
         frontRunningInterval: 28800,
         updateInterval: 3600,
     }
+
+    /*
     const btcUsd8hPool = {
         code: "BTC/USD+USDC",
         stylizedCode: "BtcUsd8h",
-        oracleAddress: "0x0c9973e7a27d00e656B9f153348dA46CaD70d03d",
         frontRunningInterval: 28800,
         updateInterval: 3600,
     }
     const btcEth8hPool = {
         code: 'BTC/ETH+WETH',
         stylizedCode: 'BtcEth8h',
-        oracleAddress: "0x6eFd3CCf5c673bd5A7Ea91b414d0307a5bAb9cC1",
         frontRunningInterval: 28800,
         updateInterval: 3600,
     }
+    */
 
     const pools = [
         ethUsdSpotPricePool,
         ethUsd8hPool,
-        btcUsd8hPool,
-        btcEth8hPool,
+        // btcUsd8hPool,
+        // btcEth8hPool,
     ]
 
     // deploy Uniswap V2
@@ -71,25 +69,36 @@ module.exports = async (hre) => {
         from: deployer,
         log: true,
         contract: "UniswapV2Router02",
-        gasLimit: DEPLOY_ROUTER_GAS_LIMIT,
+        gasLimit: DEPLOY_POOL_GAS_LIMIT,
     })
 
     // deploy test tokens
-    const token1 = await deploy("TestTokenUSD", {
-        args: ["Perpetual USD", "PPUSD"],
+    const token1 = await deploy("TestTokenETH", {
+        args: ["Pong ETH", "PETH"],
         from: deployer,
         log: true,
         contract: "TestToken",
     })
 
-    const token2 = await deploy("TestTokenEUR", {
-        args: ["Perpetual EUR", "PPEUR"],
+    const token2 = await deploy("TestTokenUSD", {
+        args: ["Pong USD", "PUSD"],
         from: deployer,
         log: true,
         contract: "TestToken",
     })
 
     // mint some bills
+    await execute(
+        "TestTokenETH",
+        {
+            from: deployer,
+            log: true,
+        },
+        "mint",
+        accounts[0].address,
+        ethers.utils.parseEther("100001") // 0.1 mil supply
+    )
+
     await execute(
         "TestTokenUSD",
         {
@@ -98,18 +107,7 @@ module.exports = async (hre) => {
         },
         "mint",
         accounts[0].address,
-        ethers.utils.parseEther("100000000") // 100 mil supply
-    )
-
-    await execute(
-        "TestTokenEUR",
-        {
-            from: deployer,
-            log: true,
-        },
-        "mint",
-        accounts[0].address,
-        ethers.utils.parseEther("100000000") // 100 mil supply
+        ethers.utils.parseEther("100001000") // 100 mil supply
     )
 
     // deploy LP token
@@ -123,9 +121,52 @@ module.exports = async (hre) => {
         token1.address,
         token2.address
     )
+
     const token = {
         address: receipt.events.find(e => e.event == "PairCreated").args[2]
     }
+
+    await execute(
+        "TestTokenETH",
+        {
+            from: deployer,
+            log: true,
+            gasLimit: DEPLOY_POOL_GAS_LIMIT,
+        },
+        "approve",
+        uniswapV2Router02.address,
+        ethers.utils.parseEther("1")
+    )
+
+    await execute(
+        "TestTokenUSD",
+        {
+            from: deployer,
+            log: true,
+            gasLimit: DEPLOY_POOL_GAS_LIMIT,
+        },
+        "approve",
+        uniswapV2Router02.address,
+        ethers.utils.parseEther("1000")
+    )
+
+    await execute(
+        "UniswapV2Router02",
+        {
+            from: deployer,
+            log: true,
+            gasLimit: DEPLOY_POOL_GAS_LIMIT,
+        },
+        "addLiquidity",
+        token1.address,
+        token2.address,
+        ethers.utils.parseEther("1"),
+        ethers.utils.parseEther("1000"),
+        ethers.utils.parseEther("1"),
+        ethers.utils.parseEther("1000"),
+        accounts[0].address,
+        2147483647
+    )
 
     // deploy PoolSwapLibrary
     const library = await deploy("PoolSwapLibrary", {
@@ -217,7 +258,6 @@ module.exports = async (hre) => {
         autoClaim.address
     )
 
-    console.log("Setting factory fee")
     const fee = ethers.utils.parseEther("0.01")
     await execute(
         "PoolFactory",
@@ -245,8 +285,9 @@ module.exports = async (hre) => {
         const oracleWrapper = await deploy(pool.stylizedCode + "OracleWrapper", {
             from: deployer,
             log: true,
-            contract: "ChainlinkOracleWrapper",
-            args: [pool.oracleAddress, deployer],
+            contract: "UniswapV2OracleWrapper",
+            args: [token.address, deployer],
+            gasLimit: DEPLOY_POOL_GAS_LIMIT,
         })
         oracleWrappers.push(oracleWrapper)
     }
