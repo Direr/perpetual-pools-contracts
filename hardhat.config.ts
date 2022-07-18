@@ -45,6 +45,7 @@ const config: HardhatUserConfig = {
         goerli: {
             url: ALCHEMY_API_TESTNET_URL,
             accounts: [TESTNET_PRIVATE_KEY],
+            gasPrice: 1000000000,
         },
         kovan: {
             url: ALCHEMY_API_TESTNET_URL,
