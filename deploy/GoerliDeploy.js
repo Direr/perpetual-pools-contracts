@@ -6,8 +6,9 @@ module.exports = async (hre) => {
 
     const DEPLOY_POOL_GAS_LIMIT = 10000000
 
-    const POOL_DEFAULT_MINTING_FEE = ethers.utils.parseEther("0.015")
-    const POOL_DEFAULT_BURNING_FEE = ethers.utils.parseEther("0.015")
+    const POOL_DEFAULT_MINTING_FEE = ethers.utils.parseEther("0")
+    const POOL_DEFAULT_MANAGEMENT_FEE = ethers.utils.parseEther("0")
+    const POOL_DEFAULT_BURNING_FEE = ethers.utils.parseEther("0")
     const POOL_DEFAULT_CHANGE_INTERVAL = "0"
 
     const HALF_LEVERAGE = 42
@@ -234,7 +235,6 @@ module.exports = async (hre) => {
         autoClaim.address
     )
 
-    const fee = ethers.utils.parseEther("0.01")
     await execute(
         "PoolFactory",
         {
@@ -242,7 +242,7 @@ module.exports = async (hre) => {
             log: true,
         },
         "setFee",
-        fee
+        POOL_DEFAULT_MANAGEMENT_FEE
     )
 
     await execute(
