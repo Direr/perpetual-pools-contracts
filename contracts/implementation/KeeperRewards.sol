@@ -111,10 +111,10 @@ contract KeeperRewards is IKeeperRewards {
          */
 
         // keeper gas cost in settlement. WAD formatted
-        uint256 _keeperGas = keeperGas(_gasPrice, _gasSpent, _settlementTokenPrice);
+        uint256 _keeperGas = 0;
 
         // tip percent
-        uint256 _tipPercent = keeperTip(_savedPreviousUpdatedTimestamp, _poolInterval);
+        uint256 _tipPercent = 0;
 
         // amount of settlement tokens to give to the keeper
         // _keeperGas + _keeperGas * percentTip
