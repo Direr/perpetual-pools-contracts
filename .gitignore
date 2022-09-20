@@ -6,3 +6,5 @@ typechain/
 coverage/
 coverage.json
 types/
+.*
+deployments/
